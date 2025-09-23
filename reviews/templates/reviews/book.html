@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% load review_extras %} {% block content %}
-<div class="page-wrapper">
+<div class="page-wrapper" id="page-top">
   <h1>{{ book.title }}</h1>
   <div class="book_description">
     {% if book.image %}
@@ -42,8 +42,37 @@
     {% endfor %}
   </ul>
 
-  <a href="{% url 'home' %}">Return to home</a>
+  {% if reviews|length > 5 %}
+  <a href="#page-top" class="back-to-top-link">Back to top ↑</a>
+  {% endif %}
+
+  <a href="{% url 'home' %}">&lsaquo; Return home</a>
   <br />
   <br />
 </div>
 {% endblock content %}
+
+{% block extra_scripts %}
+<script>
+// Floating Back to Top button logic
+document.addEventListener('DOMContentLoaded', function() {
+  const fab = document.createElement('a');
+  fab.href = '#page-top';
+  fab.className = 'back-to-top-fab';
+  fab.setAttribute('aria-label', 'Back to top');
+  fab.innerHTML = '↑';
+  document.body.appendChild(fab);
+
+  const showAfter = 600; // px scrolled
+  function onScroll() {
+    if (window.scrollY > showAfter) {
+      fab.classList.add('visible');
+    } else {
+      fab.classList.remove('visible');
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+});
+</script>
+{% endblock extra_scripts %}

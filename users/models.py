@@ -11,8 +11,13 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
 
-    # This is our custom field
-    following = models.ManyToManyField("self")
+    # Directional follow relationship: users this user follows
+    following = models.ManyToManyField(
+        "self",
+        symmetrical=False,
+        related_name="followers",
+        blank=True,
+    )
 
     @property
     def full_name(self):

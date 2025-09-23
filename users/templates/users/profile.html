@@ -1,23 +1,162 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>{{ profile_user.username }}'s Profile</h2>
-<p>Name: {{ profile_user.full_name }}</p>
-<p>Email: {{ profile_user.email }}</p>
-
-{% if user.is_authenticated and user != profile_user %}
-    <form method="post" action="">
-        {% csrf_token %}
-        {% if is_following %}
-            <button type="submit">Unfollow</button>
+{% extends "base.html" %} {% load review_extras %} {% block content %}
+<div class="page-wrapper">
+  {% if user.is_authenticated and user == profile_user %}
+  <div class="profile-wrapper">
+    <h2>My Profile</h2>
+    <div class="profile-info">
+      <p><b>Name:</b> {{ profile_user.full_name }}</p>
+      <p><b>Email:</b> {{ profile_user.email }}</p>
+      {% else %}
+      <h2>{{ profile_user.full_name }}'s Profile</h2>
+      <p>Name: {{ profile_user.full_name }}</p>
+      {% endif %} {% if user.is_authenticated and user != profile_user %}
+      <form method="post" action="" {% if is_following %}onsubmit="return confirm('Unfollow {{ profile_user.username }}?');"{% endif %}>
+        {% csrf_token %} {% if is_following %}
+        <button type="submit">Unfollow</button>
         {% else %}
-            <button type="submit">Follow</button>
+        <button type="submit">Follow</button>
         {% endif %}
-    </form>
-{% endif %}
+      </form>
+      {% endif %}
+    </div>
+    
+    <div class="profile-follow {% if profile_user.following.count > 5 %}scrollable{% endif %}">
+      <h3>Following: {{ profile_user.following.count }}</h3>
+        {% for f in profile_user.following.all %}
+      <div class="follow-row">
+        <a href="{% url 'user_profile' f.username %}">
+            <span class="follow-user">{{ f.full_name }} ({{ f.username }})</span>
+        </a>
+        {% if user.is_authenticated and user == profile_user %}
+  <form method="post" action="" class="unfollow-inline-form" onsubmit="return confirm('Unfollow {{ f.username }}?');">
+          {% csrf_token %}
+          <input type="hidden" name="unfollow_username" value="{{ f.username }}" />
+          <button type="submit" class="btn-unfollow" aria-label="Unfollow {{ f.username }}">Unfollow</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
 
-<h3>Followers: {{ profile_user.user_set.count }}</h3>
-<h3>Following: {{ profile_user.following.count }}</h3>
+    
+    <div class="profile-follow {% if profile_user.followers.count > 5 %}scrollable{% endif %}">
+      <h3>Followers: {{ profile_user.followers.count }}</h3>
+        {% for follower in profile_user.followers.all %}
+      <div class="follow-row">
+        <a href="{% url 'user_profile' follower.username %}">
+        <span class="follow-user">{{ follower.full_name }} ({{ follower.username }})</span>
+      </a>
+        {% if user.is_authenticated and user == profile_user and follower != user %}
+          {% if follower.id in following_ids %}
+          <!-- Already following back: offer unfollow with confirm -->
+          <form method="post" action="" class="unfollow-inline-form" onsubmit="return confirm('Unfollow {{ follower.username }}?');">
+            {% csrf_token %}
+            <input type="hidden" name="unfollow_username" value="{{ follower.username }}" />
+            <button type="submit" class="btn-unfollow" aria-label="Unfollow {{ follower.username }}">Unfollow</button>
+          </form>
+          {% else %}
+          <!-- Follow back button -->
+          <form method="post" action="" class="follow-inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="follow_username" value="{{ follower.username }}" />
+            <button type="submit" class="btn-follow" aria-label="Follow {{ follower.username }}">Follow</button>
+          </form>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if user.is_authenticated and user == profile_user %}
+    <div class="user-search-block">
+      <h3>Find Users</h3>
+      <form method="get" action="" class="user-search-form">
+        <input type="text" name="user_query" value="{{ user_search_query }}" placeholder="Search by username or name" aria-label="User search" />
+        <button type="submit" class="btn">Search</button>
+        {% if user_search_query %}
+          <a href="?" class="btn" style="background:#666;">Clear</a>
+        {% endif %}
+      </form>
+      {% if user_search_query %}
+        <p class="user-search-summary">Results for "{{ user_search_query }}" ({{ user_search_results|length }})</p>
+      {% endif %}
+      {% if user_search_results %}
+        <ul class="user-search-results">
+          {% for u in user_search_results %}
+            <li class="user-search-result-item">
+              <a href="{% url 'user_profile' u.username %}"><strong>{{ u.username }}</strong></a>
+              <span class="user-search-name">{{ u.full_name }}</span>
+              {% if u.id in following_ids %}
+                <form method="post" action="" class="inline-form" onsubmit="return confirm('Unfollow {{ u.username }}?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="unfollow_username" value="{{ u.username }}" />
+                  <button type="submit" class="btn-unfollow" aria-label="Unfollow {{ u.username }}">Unfollow</button>
+                </form>
+              {% else %}
+                <form method="post" action="" class="inline-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="follow_username" value="{{ u.username }}" />
+                  <button type="submit" class="btn-follow" aria-label="Follow {{ u.username }}">Follow</button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% elif user_search_query %}
+        <p>No users found.</p>
+      {% endif %}
+    </div>
+    <h2>My Reviews</h2>
+    {% else %}
+    <h3>{{ profile_user.full_name }}'s Reviews</h3>
+    {% endif %}
+    <ul>
+      {% for review in reviews %}
+      <li class="profile-reviews_item">
+        <img
+          src="{{ review.book.image.url }}"
+          class="profile-reviews_img"
+          alt="{{ review.book.title }} cover"
+        />
+        <div class="profile-reviews_item-description">
+          <a href="{% url 'book_detail' review.book.id %}"
+            >{{ review.book.title }}</a
+          >
+          <h3 class="profile-reviews_item-headline">
+            <span class="profile-reviews_item-headline-text"
+              >{{ review.headline }}</span
+            >
+            <span
+              class="book-rating"
+              aria-label="Rating: {{ review.rating }} out of 5"
+            >
+              {% render_stars review.rating %}
+            </span>
+          </h3>
+          <p class="profile-reviews_item-body" id="review-body-{{ review.id }}">
+            {{ review.body }}
+          </p>
+          <a
+            class="review-link-direct"
+            href="{% url 'book_detail' review.book.id %}#review-{{ review.id }}"
+            >Read full review →</a
+          >
+          <p class="profile-reviews_item-info">
+            New Review by
+            <a href="{% url 'user_profile' review.user.username %}"
+              >{{ review.user.username }}</a
+            >
+            on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+          </p>
+        </div>
+      </li>
+      {% empty %}
+      <li>No reviews yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <p><a href="{% url 'home' %}">&larr; Back to Home</a></p>
+  <br />
+  <br />
+</div>
 
-<a href="{% url 'home' %}">Back to Home</a>
-{% endblock content %}
+{% endblock content %} {% block extra_scripts %}{% endblock extra_scripts %}

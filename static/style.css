@@ -444,3 +444,296 @@ button[disabled] {
     border-bottom: 1px solid #ccc;
     margin: 1rem 0;
 }
+.review-item:target {
+  outline: 2px solid #0059b8;
+  background: #e8f3ff;
+  border-radius: 4px;
+  animation: target-fade 3s ease-out forwards;
+  scroll-margin-top: 90px; /* offset for fixed/sticky nav if any */
+}
+@keyframes target-fade {
+  0% { background:#fff4d1; }
+  15% { background:#e8f3ff; }
+  100% { background: transparent; }
+}
+
+/* Back to top link */
+.back-to-top-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #0059b8;
+  text-decoration: none;
+  background: #eef6ff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #c5e1ff;
+}
+.back-to-top-link:hover,
+.back-to-top-link:focus {
+  background:#d9edff;
+  outline: none;
+}
+.back-to-top-link:focus-visible {
+  outline: 2px solid #0059b8;
+  outline-offset: 2px;
+}
+
+/* Floating Back to Top FAB */
+.back-to-top-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0059b8;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  z-index: 1000;
+}
+.back-to-top-fab.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top-fab:hover,
+.back-to-top-fab:focus {
+  background: #006cd9;
+  outline: none;
+}
+.back-to-top-fab:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top-fab { transition: none; }
+}
+
+/* PROFILE PAGE */
+.profile-wrapper {
+    padding: 2rem;
+    width: 100%;
+    max-width: 1000px;
+}
+.profile-wrapper h2, h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.profile-info, .profile-follow {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 1rem 0;
+    text-align: center;
+}
+.profile-reviews_item, .profile-info, .profile-follow {
+  display: flex;
+  align-items: flex-start; /* top align */
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  padding: 1.25rem 1.5rem;
+  background:#fff;
+  border-radius:6px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Scrollable follow lists when > 5 entries */
+.profile-follow h3 {
+  margin: 0 auto;
+}
+.profile-follow.scrollable {
+  max-height: 240px; /* approx 5 * (line-height + spacing) */
+  overflow-y: auto;
+  align-items: stretch;
+}
+.profile-follow.scrollable p {
+  margin: 4px 0;
+}
+/* Optional custom scrollbar (WebKit) */
+.profile-follow.scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+.profile-follow.scrollable::-webkit-scrollbar-track {
+  background: #f2f6fa;
+  border-radius: 4px;
+}
+.profile-follow.scrollable::-webkit-scrollbar-thumb {
+  background: #b3c7dc;
+  border-radius: 4px;
+}
+.profile-follow.scrollable::-webkit-scrollbar-thumb:hover {
+  background: #99b3cc;
+}
+
+/* Following list rows */
+.follow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  background: #fff;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+.follow-row a {
+    font-weight: 500;
+    color: #0059b8;
+    text-decoration: none;
+}
+.follow-row:last-child { border-bottom: none; }
+.follow-user { font-size: 0.9rem; text-align: left; }
+.unfollow-inline-form { margin: 0; }
+.btn-unfollow {
+  background: #b23a48;
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.btn-unfollow:hover { background:#922f3b; }
+.btn-unfollow:focus-visible { outline:2px solid #922f3b; outline-offset:2px; }
+.btn-follow {
+  background: #1a7f37;
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.btn-follow:hover { background:#15642c; }
+.btn-follow:focus-visible { outline:2px solid #15642c; outline-offset:2px; }
+.profile-reviews_img {
+  width: 160px; /* fixed visual width */
+  max-width: 30%;
+  height: auto;
+  object-fit: cover;
+  border-radius:4px;
+  flex: 0 0 auto;
+}
+.profile-reviews_item-description {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 240px;
+  text-align: justify;
+}
+.profile-reviews_item-description a {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #0059b8;
+    text-decoration: none;
+}
+.profile-reviews_item-description a:hover {
+    text-decoration: underline;
+}
+.profile-reviews_item-headline {
+    margin: 0.5rem 0;
+}
+.profile-reviews_item-body {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  display: -webkit-box; /* creates flex-like anonymous boxes for clamping */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5; /* limit to 5 lines (WebKit/Blink) */
+  line-clamp: 5; /* draft spec / some modern engines */
+  /* If your linter highlights -webkit-line-clamp, that's normal: it's a vendor prefixed extension. */
+  position: relative; /* needed for gradient overlay */
+  padding-bottom: 1.75rem; /* reserve space for fade & link below */
+}
+.profile-reviews_item-body::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2.2em; /* covers ~2 lines */
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 65%);
+  pointer-events: none;
+}
+/* Remove gradient when not clamped (if ever expanded in future) */
+.profile-reviews_item-body.is-expanded::after { display: none; }
+.profile-reviews_item-info {
+  font-size: 0.85rem;
+  /* Push this metadata block to the bottom of the flex column */
+  margin-top: auto;
+  margin-bottom: 0; /* remove extra space at very bottom */
+  border-top: 1px solid #eee;
+  padding-top: 0.5rem;
+  width: 100%;
+}
+
+.profile-reviews_item-info a{
+    font-size: 0.85rem;
+}
+
+/* Review body expansion */
+.profile-reviews_item-body.is-expanded {
+  display: block; /* remove the -webkit-box so clamp no longer applies */
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  max-height: none;
+  overflow: visible;
+}
+
+.review-toggle-btn {
+  background: none;
+  color: #0059b8;
+  padding: 0;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  align-self: flex-start;
+  text-decoration: underline;
+}
+.review-toggle-btn:hover,
+.review-toggle-btn:focus {
+  text-decoration: none;
+  outline: none;
+  color: #003f82;
+}
+.review-toggle-btn:focus-visible {
+  outline: 2px solid #0059b8;
+  outline-offset: 2px;
+}
+
+/* USER SEARCH (Profile) */
+.user-search-block {
+  margin: 1.5rem 0 2.5rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  background:#fff;
+  border-radius:6px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  width:100%;
+}
+.user-search-block h3 { margin-top:0; margin-bottom:0.85rem; }
+.user-search-form { display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; }
+.user-search-form input[name="user_query"] { flex:1 1 240px; padding:0.55rem 0.65rem; border:1px solid #ccc; border-radius:4px; font-size:0.95rem; }
+.user-search-form input[name="user_query"]:focus { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.15); }
+.user-search-summary { font-size:0.75rem; margin:0.6rem 0 0.4rem; color:#555; }
+.user-search-results { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.4rem; }
+.user-search-result-item { display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; padding:0.55rem 0.65rem; background:#fafafa; border:1px solid #eee; border-radius:4px; }
+.user-search-result-item a { color:#0059b8; text-decoration:none; }
+.user-search-result-item a:hover { text-decoration:underline; }
+.user-search-name { font-size:0.75rem; color:#555; }
+.user-search-result-item form.inline-form { margin-left:auto; display:flex; }
+.user-search-result-item .btn-follow, .user-search-result-item .btn-unfollow { font-size:0.65rem; padding:4px 8px; }
