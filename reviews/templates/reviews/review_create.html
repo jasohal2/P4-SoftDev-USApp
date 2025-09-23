@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Reviewing: {{ book.title }}</h2>
+{% if book.image %}
+    <img src="{{ book.image.url }}" alt="Cover image of {{ book.title }}" style="max-width:200px;">
+{% endif %}
+<p>{{ book.description }}</p>
+
+{% if user.is_authenticated %}
+    <h3>Add a Review</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Review</button>
+    </form>
+{% endif %}
+<a href="{% url 'book_detail' book.id %}">Back to Book</a>
+{% endblock content %}

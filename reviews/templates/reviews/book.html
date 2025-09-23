@@ -11,4 +11,6 @@
             <li>No reviews available.</li>
     {% endfor %}
 </ul>
+<a href="{% url 'review_create' book.id %}">Add Review</a>
+<a href="{% url 'home' %}">Return to home</a>
 {% endblock content %}

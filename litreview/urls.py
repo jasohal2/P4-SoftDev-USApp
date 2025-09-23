@@ -33,6 +33,7 @@ urlpatterns = [
     path("home/", reviews.views.home, name="home"),
     path('books/<int:book_id>/', reviews.views.book_detail, name='book_detail'),
     path('books/add/', reviews.views.book_create, name='book_create'),
+    path('books/<int:book_id>/reviews/add/', reviews.views.review_create, name='review_create'),
 ]
 
 if settings.DEBUG:
