@@ -32,6 +32,7 @@ urlpatterns = [
     path("signup/", users.views.signup_page, name="signup"),
     path("", reviews.views.home, name="home"),
     path("recent-reviews/", reviews.views.recent_reviews, name="recent_reviews"),
+    path("search/", reviews.views.search, name="search"),
     path('books/<int:book_id>/', reviews.views.book_detail, name='book_detail'),
     path('books/add/', reviews.views.book_create, name='book_create'),
     path('books/<int:book_id>/reviews/add/', reviews.views.review_create, name='review_create'),

@@ -4,11 +4,20 @@
         <title>LitReview</title>
     </head>
     <body>
+        <nav style="display: flex; align-items: center; gap: 1em;">
+            <a href="{% url 'home' %}">LitReview</a>
+            <form method="get" action="{% url 'search' %}" style="margin:0; display:inline;">
+                <input type="text" name="q" placeholder="Search users or books" style="padding:2px 6px;">
+                <button type="submit">🔍</button>
+            </form>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user_profile' user.username %}">My Profile</a>
+                <a href="{% url 'logout' %}">Log out</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login/Sign Up</a>
+            {% endif %}
+        </nav>
         {% block content %}
         {% endblock content %}
-        {% if user.is_authenticated %}
-            <p>Welcome back, {{ user.username }}!</p>
-            <a href="{% url 'logout' %}">Log out</a>
-        {% endif %}
     </body>
 </html>

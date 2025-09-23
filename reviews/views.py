@@ -1,3 +1,19 @@
+from users.models import User
+from django.db.models import Q
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    users = books = None
+    if query:
+        if request.user.is_authenticated:
+            users = User.objects.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(username__icontains=query)
+            ).exclude(pk=request.user.pk)
+        books = Book.objects.filter(title__icontains=query)
+    context = {'users': users, 'books': books}
+    return render(request, 'reviews/search.html', context)
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -9,7 +25,7 @@ def home(request):
     context = {}
     if request.user.is_authenticated:
         following_users = request.user.following.all()
-        following_reviews = Review.objects.filter(user__in=following_users).order_by('-created')
+        following_reviews = Review.objects.filter(Q(user__in=following_users)).order_by('-created')
         trending_reviews = Review.objects.order_by('-rating', '-created')[:10]
         context['feed'] = feed
         context['following_reviews'] = following_reviews

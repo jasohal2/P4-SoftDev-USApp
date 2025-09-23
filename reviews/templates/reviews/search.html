@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Search</h1>
+<form method="get" action="">
+    <input type="text" name="q" placeholder="Search for users or books..." value="{{ request.GET.q }}" required>
+    <button type="submit">Search</button>
+</form>
+
+{% if users is not None %}
+    <h2>User Results</h2>
+    {% if users %}
+        <ul>
+        {% for user in users %}
+            <li><a href="{% url 'user_profile' user.username %}">{{ user.full_name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+{% endif %}
+
+{% if books is not None %}
+    <h2>Book Results</h2>
+    {% if books %}
+        <ul>
+        {% for book in books %}
+            <li><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No books found.</p>
+    {% endif %}
+{% endif %}
+{% endblock content %}
