@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ profile_user.username }}'s Profile</h2>
+<p>Name: {{ profile_user.full_name }}</p>
+<p>Email: {{ profile_user.email }}</p>
+
+{% if user.is_authenticated and user != profile_user %}
+    <form method="post" action="">
+        {% csrf_token %}
+        {% if is_following %}
+            <button type="submit">Unfollow</button>
+        {% else %}
+            <button type="submit">Follow</button>
+        {% endif %}
+    </form>
+{% endif %}
+
+<h3>Followers: {{ profile_user.user_set.count }}</h3>
+<h3>Following: {{ profile_user.following.count }}</h3>
+
+<a href="{% url 'home' %}">Back to Home</a>
+{% endblock content %}

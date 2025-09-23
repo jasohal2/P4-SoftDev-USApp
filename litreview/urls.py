@@ -24,16 +24,18 @@ import reviews.views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", LoginView.as_view(
+    path("login/", LoginView.as_view(
         template_name="authentication/login.html",
         redirect_authenticated_user=True,
     ), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("signup/", users.views.signup_page, name="signup"),
-    path("home/", reviews.views.home, name="home"),
+    path("", reviews.views.home, name="home"),
+    path("recent-reviews/", reviews.views.recent_reviews, name="recent_reviews"),
     path('books/<int:book_id>/', reviews.views.book_detail, name='book_detail'),
     path('books/add/', reviews.views.book_create, name='book_create'),
     path('books/<int:book_id>/reviews/add/', reviews.views.review_create, name='review_create'),
+    path('users/<str:username>/', users.views.user_profile, name='user_profile'),
 ]
 
 if settings.DEBUG:

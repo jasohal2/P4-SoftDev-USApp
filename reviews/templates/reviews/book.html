@@ -6,7 +6,7 @@
 <p>{{ book.description }}</p>
 <ul>
     {% for review in reviews %}
-        <li>{{ review.headline }}: {{ review.body }}</li>
+        <li id="review-{{ review.id }}">{{ review.headline }}: {{ review.body }}</li>
         {% empty %}
             <li>No reviews available.</li>
     {% endfor %}

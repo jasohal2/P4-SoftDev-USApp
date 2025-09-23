@@ -1,0 +1,14 @@
+{% if reviews %}
+    <ul>
+    {% for review in reviews %}
+        <li>
+            <strong><a href="{% url 'book_detail' review.book.id %}#review-{{ review.id }}">{{ review.headline }}</a></strong> by <a href="{% url 'user_profile' review.user.username %}">{{ review.user.username }}</a><br>
+            Book: {{ review.book.title }}<br>
+            Rating: {{ review.rating }}<br>
+            {{ review.body|linebreaksbr }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No reviews from users you follow yet.</p>
+{% endif %}

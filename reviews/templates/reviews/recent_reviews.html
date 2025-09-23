@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Recent Top Rated Reviews</h1>
+<a href="{% url 'home' %}">Back to Following Feed</a>
+<ul>
+{% for review in reviews %}
+    <li>
+        <strong>{{ review.headline }}</strong> by <a href="{% url 'user_profile' review.user.username %}">{{ review.user.username }}</a><br>
+        Book: {{ review.book.title }}<br>
+        Rating: {{ review.rating }}<br>
+        {{ review.body|linebreaksbr }}
+    </li>
+{% endfor %}
+</ul>
+{% endblock content %}

@@ -1,12 +1,30 @@
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from reviews.forms import BookForm, ReviewForm
-
 from .models import Book, Review
 
-@login_required
 def home(request):
-    return render(request, "reviews/home.html")
+    feed = request.GET.get('feed', 'following')
+    context = {}
+    if request.user.is_authenticated:
+        following_users = request.user.following.all()
+        following_reviews = Review.objects.filter(user__in=following_users).order_by('-created')
+        trending_reviews = Review.objects.order_by('-rating', '-created')[:10]
+        context['feed'] = feed
+        context['following_reviews'] = following_reviews
+        context['trending_reviews'] = trending_reviews
+    else:
+        trending_reviews = Review.objects.order_by('-rating', '-created')[:10]
+        context['feed'] = 'trending'
+        context['trending_reviews'] = trending_reviews
+    return render(request, "reviews/home.html", context)
+
+@login_required
+def recent_reviews(request):
+    # Show top-rated reviews for logged-in users
+    reviews = Review.objects.order_by('-rating', '-created')[:10]
+    return render(request, "reviews/recent_reviews.html", {"reviews": reviews})
 
 def book_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
