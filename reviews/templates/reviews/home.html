@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Welcome to LitReview</h1>
-<p>Your platform for sharing and discovering book reviews.</p>
-<a href="{% url 'book_create' %}">Add a New Book</a>
-
 {% if user.is_authenticated %}
 	<div style="margin: 1em 0;">
 		<a href="?feed=following">Following</a>

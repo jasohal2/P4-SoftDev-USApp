@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 
-{% if form.errors %} {{ form.errors }} {% endif %}
-<div class="auth-page">
+
+<div class="page-wrapper">
   <form method="post" class="signup-form" id="signup-form">
     <h2>Sign Up</h2>
     {% csrf_token %}

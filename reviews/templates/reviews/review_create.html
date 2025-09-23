@@ -1,19 +1,119 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h2>Reviewing: {{ book.title }}</h2>
-{% if book.image %}
-    <img src="{{ book.image.url }}" alt="Cover image of {{ book.title }}" style="max-width:200px;">
-{% endif %}
-<p>{{ book.description }}</p>
+<div class="page-wrapper">
+  <h1>Post a review</h1>
+  <div class="book_description">
+    {% if book.image %}
+    <img
+      src="{{ book.image.url }}"
+      class="book_description-image"
+      alt="Cover image of {{ book.title }}"
+    />
+    {% endif %}
 
-{% if user.is_authenticated %}
-    <h3>Add a Review</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit Review</button>
-    </form>
-{% endif %}
-<a href="{% url 'book_detail' book.id %}">Back to Book</a>
+    <div class="book_description-text">
+      <h2>{{ book.title }}</h2>
+      <p>{{ book.description }}</p>
+    </div>
+  </div>
+
+  {% if user.is_authenticated %}
+  <form method="post" class="review-form" novalidate>
+    {% csrf_token %}
+    {# Headline #}
+    <div class="form-group">
+      <label for="id_headline">{{ form.headline.label }} <span class="required-asterisk" aria-hidden="true">*</span></label>
+      {{ form.headline }}
+      {% if form.headline.errors %}<div class="field-errors">{{ form.headline.errors }}</div>{% endif %}
+    </div>
+
+    {# Body #}
+    <div class="form-group">
+      <label for="id_body">{{ form.body.label }} <span class="required-asterisk" aria-hidden="true">*</span></label>
+      {{ form.body }}
+      {% if form.body.errors %}<div class="field-errors">{{ form.body.errors }}</div>{% endif %}
+    </div>
+
+    {# Rating (custom star radio) #}
+    <div class="form-group">
+      <fieldset class="rating-fieldset" aria-labelledby="rating-legend">
+        <legend id="rating-legend">Rating <span class="required-asterisk" aria-hidden="true">*</span></legend>
+        <div class="star-rating" role="radiogroup" aria-label="Choose a rating from 1 to 5 stars">
+          {% with current=form.rating.value|stringformat:'s' %}
+          {# Stars 5..1 #}
+          {% for val in "54321"|make_list %}
+            <input type="radio" name="rating" id="rating-{{ val }}" value="{{ val }}" {% if current == val %}checked{% endif %} required>
+            <label for="rating-{{ val }}" aria-label="{{ val }} star{% if val != '1' %}s{% endif %}">★</label>
+          {% endfor %}
+          {% endwith %}
+          <button type="button" class="clear-rating-btn" id="clear-rating" aria-label="Clear rating">Clear</button>
+        </div>
+        <div id="rating-feedback" class="rating-feedback" aria-live="polite"></div>
+        {% if form.rating.errors %}<div class="field-errors">{{ form.rating.errors }}</div>{% endif %}
+      </fieldset>
+    </div>
+
+    <button type="submit" id="submit-review">Submit Review</button>
+    <a href="{% url 'book_detail' book.id %}">Back to Book</a>
+    {% endif %}
+  </form>
+</div>
+<script>
+(function(){
+  const group = document.querySelector('.star-rating');
+  if(!group) return;
+  const radios = Array.from(group.querySelectorAll('input[type="radio"]'));
+  const feedback = document.getElementById('rating-feedback');
+  const clearBtn = document.getElementById('clear-rating');
+  const submitBtn = document.getElementById('submit-review');
+
+  function currentValue(){
+    const r = radios.find(r=>r.checked);
+    return r ? r.value : '';
+  }
+  function labelFor(val){
+    switch(val){
+      case '5': return 'Excellent';
+      case '4': return 'Good';
+      case '3': return 'Average';
+      case '2': return 'Fair';
+      case '1': return 'Poor';
+      default: return '';
+    }
+  }
+  function updateFeedback(tempVal){
+    const val = tempVal || currentValue();
+    if(!val){
+      feedback.textContent = 'No rating selected';
+      return;
+    }
+    feedback.textContent = `${val} star${val==='1'?'':'s'} – ${labelFor(val)}`;
+  }
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => updateFeedback());
+    radio.addEventListener('focus', () => updateFeedback(radio.value));
+    radio.addEventListener('mouseenter', () => updateFeedback(radio.value));
+  });
+  group.addEventListener('mouseleave', () => updateFeedback());
+  if(clearBtn){
+    clearBtn.addEventListener('click', ()=>{
+      radios.forEach(r=> r.checked = false);
+      updateFeedback('');
+    });
+  }
+  // Initial
+  updateFeedback();
+  // Prevent submit without rating
+  if(submitBtn){
+    submitBtn.addEventListener('click', (e)=>{
+      if(!currentValue()){
+        e.preventDefault();
+        feedback.textContent = 'Please choose a rating before submitting.';
+        feedback.classList.add('rating-feedback-error');
+        radios[radios.length-1].focus(); // focus lowest star for easy nav
+      }
+    });
+  }
+})();
+</script>
 {% endblock content %}

@@ -1,9 +1,45 @@
 {% extends "base.html" %} {% block content %}
-<h1>Create a New Book</h1>
-<form method="post" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    {{ form.as_p }}
+<div class="page-wrapper">
+  <form
+    method="post"
+    class="book-form"
+    enctype="multipart/form-data"
+    novalidate
+  >
+    <h2>Create a New Book</h2>
+    <p class="required-legend">
+      <span class="required-asterisk" aria-hidden="true">*</span> Required field
+    </p>
+    {% csrf_token %} {# Title field (required) #}
+    <div class="form-group required-field">
+      <label for="{{ form.title.id_for_label }}">
+        {{ form.title.label }}
+        <span class="required-asterisk" aria-hidden="true">*</span>
+      </label>
+      {{ form.title }} {% if form.title.errors %}
+      <div class="field-errors">{{ form.title.errors }}</div>
+      {% endif %}
+    </div>
+
+    {# Description (optional) #}
+    <div class="form-group optional-field">
+      <label for="{{ form.description.id_for_label }}"
+        >Description <span class="optional-indicator">(optional)</span></label
+      >
+      {{ form.description }}
+    </div>
+
+    {# Image (optional) #}
+    <div class="form-group optional-field">
+      <label for="{{ form.image.id_for_label }}"
+        >{{ form.image.label }}
+        <span class="optional-indicator">(optional)</span></label
+      >
+      {{ form.image }}
+    </div>
+
     <button type="submit">Add Book</button>
-</form>
-Return to <a href="{% url 'home' %}">home</a>.
+  </form>
+</div>
+<!-- Return to <a href="{% url 'home' %}">home</a>. -->
 {% endblock content %}

@@ -1,16 +1,49 @@
-{% extends "base.html" %} {% block content %}
-<h2>{{ book.title }}</h2>
-{% if book.image %}
-    <img src="{{ book.image.url }}" alt="Cover image of {{ book.title }}">
-{% endif %}
-<p>{{ book.description }}</p>
-<ul>
+{% extends "base.html" %} {% load review_extras %} {% block content %}
+<div class="page-wrapper">
+  <h1>{{ book.title }}</h1>
+  <div class="book_description">
+    {% if book.image %}
+    <img
+      src="{{ book.image.url }}"
+      class="book_description-image"
+      alt="Cover image of {{ book.title }}"
+    />
+    {% endif %}
+    <div class="book_description-text"><p>{{ book.description }}</p></div>
+  </div>
+  <a href="{% url 'review_create' book.id %}" class="btn"
+    >Post a review for this book</a
+  >
+  <ul class="reviews-list">
     {% for review in reviews %}
-        <li id="review-{{ review.id }}">{{ review.headline }}: {{ review.body }}</li>
-        {% empty %}
-            <li>No reviews available.</li>
+    <li class="review-item" id="review-{{ review.id }}">
+      New Review by
+      <a href="{% url 'user_profile' review.user.username %}"
+        >{{ review.user.username }}</a
+      >
+      on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+      <br />
+      <br />
+      <h3 class="review-headline">
+        <span class="review-headline-text">{{ review.headline }}</span>
+        <span
+          class="book-rating"
+          aria-label="Rating: {{ review.rating }} out of 5"
+        >
+          {% render_stars review.rating %}
+        </span>
+      </h3>
+      <br />
+      <br />
+      {{ review.body }}
+    </li>
+    {% empty %}
+    <li>No reviews available.</li>
     {% endfor %}
-</ul>
-<a href="{% url 'review_create' book.id %}">Add Review</a>
-<a href="{% url 'home' %}">Return to home</a>
+  </ul>
+
+  <a href="{% url 'home' %}">Return to home</a>
+  <br />
+  <br />
+</div>
 {% endblock content %}

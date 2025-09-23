@@ -20,8 +20,9 @@ nav {
   padding: 1em;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* sides fixed, middle grows */
   gap: 1em;
+  width: 100%;
 }
 nav a,
 nav form button {
@@ -44,10 +45,11 @@ nav form button:hover {
 .nav_home {
   font-weight: bold;
   font-size: 1.2em;
+  flex: 0 0 auto; /* do not shrink */
 }
 
 .nav_search {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
 }
@@ -65,11 +67,11 @@ nav form button:hover {
 
 .nav_search .search-wrapper {
   display: flex;
-  width: 100%;              
-  max-width: 600px;          
-  margin: 0 auto;            
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   align-items: center;
-  gap: 8px;                  
+  gap: 8px;
 }
 
 .nav_search input[type="text"] {
@@ -77,9 +79,9 @@ nav form button:hover {
   border-radius: 3px;
   border: 1px solid #ccc;
   height: 40px;
-  flex: 1;              
-  width: auto;          
-  min-width: 0;         
+  flex: 1;
+  width: auto;
+  min-width: 0;
 }
 
 .nav_search input[type="text"]:focus {
@@ -89,21 +91,32 @@ nav form button:hover {
 }
 
 .nav_search input[type="text"]:hover {
-    outline: 2px solid black;
+  outline: 2px solid black;
   transition: all 0.3s;
 }
 
 .nav_search button {
-    height: 40px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* fixed width to avoid icon load shift */
+  flex: 0 0 44px;
 }
-
 h1,
 h2,
 h3 {
   color: #333;
+}
+
+/* Reserve space for right side links so center doesn't move */
+.nav_profile {
+  flex: 0 0 auto;
+  min-width: 160px; /* adjust if you add/remove links */
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
 }
 
 ul {
@@ -119,37 +132,54 @@ li {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-button {
-  background: #007bff;
+button, .btn {
+  background: #0059b8;
   color: #fff;
   border: none;
   border-radius: 3px;
-  padding: 6px 12px;
+  padding: 12px 24px;
   cursor: pointer;
+  text-decoration: none;
 }
+
+.btn {
+    display: inline-block;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+button:hover, .btn:hover {
+  background: #006cd9;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
 button:disabled {
   background: #aaa;
   cursor: not-allowed;
 }
 
-/* LOGIN */
-
-/* Optional page-level wrapper if you want vertical + horizontal centering:
-   <div class="auth-page"><form ... class="login-form"> ... */
-.auth-page {
+.page-wrapper {
   min-height: calc(100vh - 80px); /* subtract approx nav height */
   display: flex;
-  align-items: flex-start; /* change to center for perfect vertical center */
-  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* change to center for perfect vertical center */
+  justify-content: flex-start; /* change to center for perfect vertical center */
   padding-top: 3rem; /* space from top when not vertically centering */
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-.login-form, .signup-form {
+/* FORMS */
+
+.login-form,
+.signup-form,
+.book-form,
+.review-form {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;          /* centers horizontally */
+  margin: 0 auto; /* centers horizontally */
   padding: 2em 2.25em;
   background: #fff;
   border-radius: 8px;
@@ -159,13 +189,27 @@ button:disabled {
   gap: 1rem;
 }
 
-.login-form p { margin: 0; }
+.review-form {
+    max-width: 1200px;
+    margin-bottom: 4rem;
+}
+
+.login-form p,
+.signup-form p,
+.book-form p,
+.review-form p {
+  margin: 0;
+}
 
 .login-form input[type="text"],
 .login-form input[type="password"],
 .signup-form input[type="text"],
 .signup-form input[type="password"],
-.signup-form input[type="email"] {
+.signup-form input[type="email"],
+.book-form input[type="text"],
+.book-form textarea,
+.review-form input[type="text"],
+.review-form textarea {
   width: 100%;
   padding: 0.65rem 0.75rem;
   border: 1px solid #ccc;
@@ -174,29 +218,97 @@ button:disabled {
   margin: 12px 0 12px 0;
 }
 
-.login-form input:focus, .signup-form input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+.book-form input[type="file"] {
+    width: 100%;
+    padding: 0.65rem 0;
+    font-size: 1rem;
+    margin: 12px 0 12px 0;
 }
 
-.login-form button[type="submit"], .signup-form button[type="submit"] {
+.login-form input:focus,
+.signup-form input:focus,
+.book-form input:focus,
+.book-form textarea:focus,
+.review-form input:focus,
+.review-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.login-form button[type="submit"],
+.signup-form button[type="submit"],
+.book-form button[type="submit"],
+.review-form button[type="submit"] {
   align-self: flex-end;
   padding: 0.6rem 1.25rem;
   font-size: 1rem;
   font-weight: 500;
   background: #0059b8;
   border-radius: 4px;
-  transition: background .2s ease;
+  transition: background 0.2s ease;
 }
 
-.login-form button[type="submit"]:hover {
+.login-form button[type="submit"]:hover,
+.signup-form button[type="submit"]:hover,
+.book-form button[type="submit"]:hover {
   background: #006cd9;
 }
 
 @media (max-width: 500px) {
-  .login-form { padding: 1.5em 1.25em; }
+  .login-form {
+    padding: 1.5em 1.25em;
+  }
 }
+
+/* STAR RATING (review create) */
+.rating-fieldset { border: 0; margin:0; padding:0; }
+.star-rating {
+  display:inline-flex;
+  flex-direction: row-reverse; /* so hovering a star colors previous ones via sibling selector */
+  gap: 0.35rem;
+  align-items:center;
+  margin: 12px 0;
+}
+.star-rating input[type="radio"] { position: absolute; opacity: 0; width:0; height:0; }
+.star-rating label {
+  cursor: pointer;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #ccc;
+  transition: color .15s ease, transform .15s ease;
+  user-select: none;
+}
+/* Hover fill */
+.star-rating label:hover,
+.star-rating label:hover ~ label { color: #000000; }
+/* Checked fill */
+.star-rating input[type="radio"]:checked ~ label { color: #000000; }
+/* Keyboard focus outline on underlying input using adjacent label styling */
+.star-rating input[type="radio"]:focus + label { outline: 2px solid #0059b8; outline-offset: 2px; border-radius:4px; }
+/* 0 rating styling (smaller) */
+.star-rating label[for^="rating-0"] { font-size: 1rem; padding: 0 0.25rem; color:#666; }
+
+/* New feedback + clear button styles */
+.clear-rating-btn {
+  background: #eee;
+  color: #333;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 1.1;
+}
+.clear-rating-btn:hover { background:#e2e2e2; }
+.rating-feedback {
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+  min-height: 1em;
+  color:#555;
+}
+.rating-feedback-error { color:#b23a48; font-weight:500; }
+
 
 /* SIGNUP / PASSWORD RULES */
 .password-rules {
@@ -211,31 +323,33 @@ button:disabled {
   padding-left: 22px;
   color: #555;
   margin-bottom: 4px;
-  transition: color .25s ease;
+  transition: color 0.25s ease;
 }
 .password-rules li::before {
-  content: '\f00d'; /* fa-times (unmet) */
+  content: "\f00d"; /* fa-times (unmet) */
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   position: absolute;
   left: 0;
-  top: 50%;                 /* center vertically */
+  top: 50%; /* center vertically */
   transform: translateY(-50%);
   color: #b23a48;
   font-size: 0.85rem;
-  line-height: 1;            /* tighter for centering */
-  transition: all .25s ease;
+  line-height: 1; /* tighter for centering */
+  transition: all 0.25s ease;
 }
 .password-rules li.met {
   color: #1a7f37;
   font-weight: 500;
 }
 .password-rules li.met::before {
-  content: '\f00c'; /* fa-check */
+  content: "\f00c"; /* fa-check */
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   color: #1a7f37;
   transform: scale(1.15);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .password-match-msg {
@@ -243,10 +357,14 @@ button:disabled {
   margin-top: -4px;
   margin-bottom: 8px;
   min-height: 1em; /* reserve space */
-  transition: color .25s ease;
+  transition: color 0.25s ease;
 }
-.password-match-msg.error { color: #b23a48; }
-.password-match-msg.ok { color: #1a7f37; }
+.password-match-msg.error {
+  color: #b23a48;
+}
+.password-match-msg.ok {
+  color: #1a7f37;
+}
 
 button[disabled] {
   opacity: 0.6;
@@ -254,13 +372,75 @@ button[disabled] {
 }
 
 /* USERNAME AVAILABILITY */
-.username-status { font-size: 0.75rem; display: inline-block; min-height: 1em; margin-top: 2px; }
-.username-status.checking { color: #555; }
-.username-status.ok { color: #1a7f37; }
-.username-status.error { color: #b23a48; }
+.username-status {
+  font-size: 0.75rem;
+  display: inline-block;
+  min-height: 1em;
+  margin-top: 2px;
+}
+.username-status.checking {
+  color: #555;
+}
+.username-status.ok {
+  color: #1a7f37;
+}
+.username-status.error {
+  color: #b23a48;
+}
 
 /* EMAIL AVAILABILITY */
-.email-status { font-size: 0.75rem; display: inline-block; min-height: 1em; margin-top: 2px; }
-.email-status.checking { color: #555; }
-.email-status.ok { color: #1a7f37; }
-.email-status.error { color: #b23a48; }
+.email-status {
+  font-size: 0.75rem;
+  display: inline-block;
+  min-height: 1em;
+  margin-top: 2px;
+}
+.email-status.checking {
+  color: #555;
+}
+.email-status.ok {
+  color: #1a7f37;
+}
+.email-status.error {
+  color: #b23a48;
+}
+
+/* BOOK FORM FIELD STYLING */
+.book-form .form-group { margin-bottom: 1.1rem; display:flex; flex-direction:column; }
+.book-form label { font-weight: 500; margin-bottom: 0.35rem; }
+.required-asterisk { color: #b23a48; font-weight:700; }
+.optional-indicator { font-weight:400; font-size:0.8rem; color:#555; }
+.field-note { font-size: 0.75rem; color:#555; margin-top: 0.3rem; }
+.required-field .field-note { color:#b23a48; }
+.field-errors { color:#b23a48; font-size:0.8rem; margin-bottom:0.25rem; }
+.book-form input[type="text"],
+.book-form textarea { padding:0.55rem 0.65rem; border:1px solid #ccc; border-radius:4px; font-size:0.95rem; }
+.book-form input[type="text"]:focus,
+.book-form textarea:focus { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.15); }
+.required-legend { font-size:0.75rem; color:#555; margin:-0.25rem 0 1rem; }
+
+/* BOOK DETAIL PAGE */
+.book_description {
+    display: flex;
+    padding: 2rem;
+}
+.book_description-image {
+    width: 25%;
+}
+.book_description-text p{
+    padding: 0 4rem;
+    font-size: 20px;
+    text-align: justify;
+}
+.book_description-text h2 {
+    padding: 0 4rem;
+    margin-bottom: 2rem;
+}
+.reviews-list {
+    padding: 2rem;
+}
+.review-item {
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    margin: 1rem 0;
+}
