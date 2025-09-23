@@ -32,6 +32,8 @@ urlpatterns = [
     path("signup/", users.views.signup_page, name="signup"),
     path("home/", reviews.views.home, name="home"),
     path('books/<int:book_id>/', reviews.views.book_detail, name='book_detail'),
+    path('books/add/', reviews.views.book_create, name='book_create'),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

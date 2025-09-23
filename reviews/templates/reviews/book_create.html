@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% block content %}
+<h1>Create a New Book</h1>
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Book</button>
+</form>
+Return to <a href="{% url 'home' %}">home</a>.
+{% endblock content %}
