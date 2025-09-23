@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ book.title }}</h2>
+{% if book.image %}
+    <img src="{{ book.image.url }}" alt="Cover image of {{ book.title }}">
+{% endif %}
+<p>{{ book.description }}</p>
+<ul>
+    {% for review in reviews %}
+        <li>{{ review.headline }}: {{ review.body }}</li>
+        {% empty %}
+            <li>No reviews available.</li>
+    {% endfor %}
+</ul>
+{% endblock content %}

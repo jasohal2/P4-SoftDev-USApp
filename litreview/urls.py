@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 import users.views
 import reviews.views
@@ -29,4 +31,7 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("signup/", users.views.signup_page, name="signup"),
     path("home/", reviews.views.home, name="home"),
+    path('books/<int:book_id>/', reviews.views.book_detail, name='book_detail'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
