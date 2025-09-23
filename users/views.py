@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from users.models import User
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 
 from . import forms
 
@@ -15,6 +16,29 @@ def signup_page(request):
             login(request, user)
             return redirect("home")
     return render(request, "authentication/signup.html", {"form": form})
+
+def username_available(request):
+    """AJAX endpoint to check if a username is available.
+    Query param: ?username=foo
+    Returns JSON: {"available": true/false}
+    Always returns 200 to simplify client logic.
+    """
+    username = request.GET.get("username", "").strip()
+    available = bool(username) and not User.objects.filter(username__iexact=username).exists()
+    return JsonResponse({"available": available, "username": username})
+
+def email_available(request):
+    """AJAX endpoint to check if an email is available.
+    Query param: ?email=foo@example.com
+    Returns JSON: {"available": true/false}
+    Always 200.
+    Empty email returns available=false to prompt entry.
+    """
+    email = request.GET.get("email", "").strip()
+    if not email:
+        return JsonResponse({"available": False, "email": email})
+    available = not User.objects.filter(email__iexact=email).exists()
+    return JsonResponse({"available": available, "email": email})
 
 @login_required
 def user_profile(request, username):

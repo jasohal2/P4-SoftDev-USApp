@@ -1,9 +1,12 @@
 <!-- templates/authentication/login.html -->
 {% extends "base.html" %} {% block content %}
 <p>{{ message }}</p>
-<form method="post">
-  {{ form.as_p }} {% csrf_token %}
-  <button type="submit">Log in</button>
-</form>
-<p>Not a member? <a href="{% url 'signup' %}">Sign up now!</a></p>
+<div class="auth-page">
+  <form method="post" class="login-form">
+    <h2>Log In</h2>
+    {{ form.as_p }} {% csrf_token %}
+    <button type="submit">Log in</button>
+    <p>Not a member? <a href="{% url 'signup' %}">Sign up now!</a></p>
+  </form>
+</div>
 {% endblock content %}

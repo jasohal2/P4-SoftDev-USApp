@@ -1,9 +1,174 @@
 {% extends "base.html" %} {% block content %}
-<h2>Sign Up</h2>
+
 {% if form.errors %} {{ form.errors }} {% endif %}
-<form method="post">
-  {{ form.as_p }} {% csrf_token %}
-  <button type="submit">Sign up</button>
-</form>
-<p>Already a member? <a href="{% url 'login' %}">Log in now!</a></p>
+<div class="auth-page">
+  <form method="post" class="signup-form" id="signup-form">
+    <h2>Sign Up</h2>
+    {% csrf_token %}
+    {{ form.username.errors }}
+    <p>{{ form.username.label_tag }} {{ form.username }}<br>
+      <span id="username-status" class="username-status" aria-live="polite"></span>
+    </p>
+    {{ form.first_name.errors }}
+    <p>{{ form.first_name.label_tag }} {{ form.first_name }}</p>
+    {{ form.last_name.errors }}
+    <p>{{ form.last_name.label_tag }} {{ form.last_name }}</p>
+    {{ form.email.errors }}
+    <p>{{ form.email.label_tag }} {{ form.email }}<br>
+      <span id="email-status" class="email-status" aria-live="polite"></span>
+    </p>
+    {# Password fields from UserCreationForm: password1 & password2 #}
+    {{ form.password1.errors }}
+    <p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+    <ul class="password-rules" id="password-rules">
+      <li data-rule="length">Minimum 8 characters</li>
+      <li data-rule="letter">Contains a letter (a-z or A-Z)</li>
+      <li data-rule="number">Contains a number (0-9)</li>
+    </ul>
+  {{ form.password2.errors }}
+  <p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
+  <p id="password-match-msg" class="password-match-msg" aria-live="polite"></p>
+  <button type="submit" id="signup-submit" disabled>Sign up</button>
+    <p>Already a member? <a href="{% url 'login' %}">Log in now!</a></p>
+  </form>
+  
+</div>
+<script>
+  (function() {
+  const usernameInput = document.getElementById('id_username');
+  const usernameStatus = document.getElementById('username-status');
+  const emailInput = document.getElementById('id_email');
+  const emailStatus = document.getElementById('email-status');
+  const pwd1 = document.getElementById('id_password1');
+    // Email availability debounce
+    let emailTimer;
+    function checkEmail() {
+      const value = emailInput.value.trim();
+      if (!value) {
+        emailStatus.textContent = '';
+        emailStatus.className = 'email-status';
+        return;
+      }
+      // rudimentary format check to avoid useless request
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+        emailStatus.textContent = 'Enter a valid email format';
+        emailStatus.className = 'email-status error';
+        return;
+      }
+      emailStatus.textContent = 'Checking...';
+      emailStatus.className = 'email-status checking';
+      fetch(`{% url 'email_available' %}?email=${encodeURIComponent(value)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.email.toLowerCase() !== value.toLowerCase()) return; // stale response
+          if (data.available) {
+            emailStatus.textContent = 'Email is available';
+            emailStatus.className = 'email-status ok';
+          } else {
+            emailStatus.textContent = 'Email is already registered';
+            emailStatus.className = 'email-status error';
+          }
+        })
+        .catch(() => {
+          emailStatus.textContent = 'Could not verify email';
+          emailStatus.className = 'email-status error';
+        });
+    }
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        clearTimeout(emailTimer);
+        emailTimer = setTimeout(checkEmail, 400);
+      });
+    }
+    // Username availability debounce
+    let unameTimer;
+    function checkUsername() {
+      const value = usernameInput.value.trim();
+      if (!value) {
+        usernameStatus.textContent = '';
+        usernameStatus.className = 'username-status';
+        return;
+      }
+      usernameStatus.textContent = 'Checking...';
+      usernameStatus.className = 'username-status checking';
+      fetch(`{% url 'username_available' %}?username=${encodeURIComponent(value)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.username.toLowerCase() !== value.toLowerCase()) return; // stale
+          if (data.available) {
+            usernameStatus.textContent = 'Username is available';
+            usernameStatus.className = 'username-status ok';
+          } else {
+            usernameStatus.textContent = 'Username is already taken';
+            usernameStatus.className = 'username-status error';
+          }
+        })
+        .catch(() => {
+          usernameStatus.textContent = 'Could not verify';
+          usernameStatus.className = 'username-status error';
+        });
+    }
+    if (usernameInput) {
+      usernameInput.addEventListener('input', () => {
+        clearTimeout(unameTimer);
+        unameTimer = setTimeout(checkUsername, 400);
+      });
+    }
+    const pwd2 = document.getElementById('id_password2');
+    const submitBtn = document.getElementById('signup-submit');
+    const matchMsg = document.getElementById('password-match-msg');
+    const rules = {
+      length: document.querySelector('[data-rule="length"]'),
+      letter: document.querySelector('[data-rule="letter"]'),
+      number: document.querySelector('[data-rule="number"]')
+    };
+
+    function evaluateRules(value) {
+      toggle(rules.length, value.length >= 8);
+      toggle(rules.letter, /[a-zA-Z]/.test(value));
+      toggle(rules.number, /\d/.test(value));
+    }
+
+    function toggle(li, condition) {
+      if(!li) return;
+      li.classList.toggle('met', condition);
+    }
+
+    function allRulesMet() {
+      return Object.values(rules).every(li => li && li.classList.contains('met'));
+    }
+
+    function checkMatch() {
+      const v1 = pwd1.value;
+      const v2 = pwd2.value;
+      if (!v1 && !v2) {
+        matchMsg.textContent = '';
+        matchMsg.className = 'password-match-msg';
+        submitBtn.disabled = true;
+        return;
+      }
+      if (v2 && v1 === v2) {
+        matchMsg.textContent = 'Passwords match';
+        matchMsg.className = 'password-match-msg ok';
+      } else if (v2) {
+        matchMsg.textContent = 'Passwords do not match';
+        matchMsg.className = 'password-match-msg error';
+      } else {
+        matchMsg.textContent = '';
+        matchMsg.className = 'password-match-msg';
+      }
+      submitBtn.disabled = !(allRulesMet() && v1 && v2 && v1 === v2);
+    }
+
+    if (pwd1) {
+      pwd1.addEventListener('input', () => { evaluateRules(pwd1.value); checkMatch(); });
+      evaluateRules(pwd1.value || '');
+    }
+    if (pwd2) {
+      pwd2.addEventListener('input', checkMatch);
+    }
+    // Initial state
+    checkMatch();
+  })();
+</script>
 {% endblock content %}
