@@ -15,8 +15,7 @@
         >
         <br />
         <span
-          >{{ user.followers_count }} follower{{ user.followers_count|pluralize
-          }}</span
+          >{{ user.followers_count }} follower{{ user.followers_count|pluralize }}</span
         >
         <span>{{ user.following_count }} following</span>
       </div>
@@ -31,11 +30,15 @@
   <ul class="book-results">
     {% for book in books %}
     <li class="book-result-item">
+      {% if book.image %}
       <img
         src="{{ book.image.url }}"
         alt="Cover image for {{ book.title }}"
         class="book-result_img"
       />
+      {% else %}
+      <div class="book-result_img placeholder" aria-hidden="true"></div>
+      {% endif %}
       <div class="book-info">
         <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
         <div class="book-rating-block">

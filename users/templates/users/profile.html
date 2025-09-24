@@ -191,11 +191,15 @@
     <ul>
       {% for review in reviews %}
       <li class="profile-reviews_item">
+        {% if review.book.image %}
         <img
           src="{{ review.book.image.url }}"
           class="profile-reviews_img"
           alt="{{ review.book.title }} cover"
         />
+        {% else %}
+        <div class="profile-reviews_img placeholder" aria-hidden="true"></div>
+        {% endif %}
         <div class="profile-reviews_item-description">
           <a 
           href="{% url 'book_detail' review.book.id %}"
@@ -244,7 +248,11 @@
             </div>
           </div>
           <p class="profile-reviews_item-info">
-            Review posted on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% if forloop.first %}
+              New review posted on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% else %}
+              Review posted on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% endif %}
           </p>
           {% else %}
           <div class="profile-review_links">
@@ -255,11 +263,15 @@
             >
           </div>
           <p class="profile-reviews_item-info">
-            Review by
-            <a href="{% url 'user_profile' review.user.username %}"
-              >{{ review.user.username }}</a
-            >
-            on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% if forloop.first %}
+              New review by
+              <a href="{% url 'user_profile' review.user.username %}">{{ review.user.username }}</a>
+              on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% else %}
+              Review by
+              <a href="{% url 'user_profile' review.user.username %}">{{ review.user.username }}</a>
+              on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+            {% endif %}
           </p>
           {% endif %}
         </div>

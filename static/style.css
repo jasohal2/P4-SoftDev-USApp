@@ -14,6 +14,14 @@ body {
   background: #fff4d1;
 }
 
+a {
+  color: #0059b8;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
 nav {
   background: #0059b8;
   color: #fff;
@@ -103,6 +111,13 @@ nav form button:hover {
   justify-content: center;
   width: 44px; /* fixed width to avoid icon load shift */
   flex: 0 0 44px;
+}
+.nav_search button .icon-search {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  display: block;
 }
 h1,
 h2,
@@ -547,7 +562,7 @@ button[disabled] {
 /* BOOK DETAIL PAGE */
 .book_description {
   display: flex;
-  padding: 2rem;
+  padding: 4rem;
 }
 .book_description-image {
   width: 25%;
@@ -563,7 +578,8 @@ button[disabled] {
   margin-bottom: 2rem;
 }
 .reviews-list {
-  padding: 2rem;
+  padding: 4rem;
+  width: 100%;
 }
 .review-item {
   padding: 1rem;
@@ -602,7 +618,6 @@ button[disabled] {
     width: 18px;
     height: 18px;
   }
-}
 @keyframes target-fade {
   0% {
     background: #fff4d1;
@@ -807,6 +822,14 @@ h3 {
   outline-offset: 2px;
 }
 
+/* SEARCH ICON */
+.icon-search {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 /* REVIEWS LIST (Profile and Home) */
 .profile-reviews_img,
 .home-review-item_img {
@@ -816,6 +839,12 @@ h3 {
   object-fit: cover;
   border-radius: 4px;
   flex: 0 0 auto;
+}
+.profile-reviews_img.placeholder,
+.home-review-item_img.placeholder,
+.book-result_img.placeholder {
+  background: #e5e7eb;
+  min-height: 220px; /* approximate cover height zone */
 }
 .profile-reviews_item-description,
 .home-review-item_description {

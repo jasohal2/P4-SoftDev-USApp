@@ -3,11 +3,15 @@
 <ul class="home-review-list">
     {% for review in reviews %}
     <li class="home-review-item">
+        {% if review.book.image %}
         <img
             src="{{ review.book.image.url }}"
             class="home-review-item_img"
             alt="{{ review.book.title }} cover"
         />
+        {% else %}
+        <div class="home-review-item_img placeholder" aria-hidden="true"></div>
+        {% endif %}
         <div class="home-review-item_description">
                 <a 
                     href="{% url 'book_detail' review.book.id %}"
