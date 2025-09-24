@@ -1,18 +1,34 @@
 from users.models import User
-from django.db.models import Q
+from django.db.models import Q, Count, Avg
 
 def search(request):
     query = request.GET.get('q', '').strip()
     users = books = None
     if query:
         if request.user.is_authenticated:
-            users = User.objects.filter(
-                Q(first_name__icontains=query) |
-                Q(last_name__icontains=query) |
-                Q(username__icontains=query)
-            ).exclude(pk=request.user.pk)
-        books = Book.objects.filter(title__icontains=query)
-    context = {'users': users, 'books': books}
+            users = (
+                User.objects.filter(
+                    Q(first_name__icontains=query) |
+                    Q(last_name__icontains=query) |
+                    Q(username__icontains=query)
+                )
+                .exclude(pk=request.user.pk)
+                .annotate(
+                    review_count=Count('review', distinct=True),
+                    followers_count=Count('followers', distinct=True),
+                    following_count=Count('following', distinct=True),
+                )  # aggregated counts
+                .order_by('username')
+            )
+        books = (
+            Book.objects.filter(title__icontains=query)
+            .annotate(
+                avg_rating=Avg('review__rating'),
+                review_count=Count('review', distinct=True),
+            )
+            .order_by('title')
+        )
+    context = {'users': users, 'books': books, 'query': query}
     return render(request, 'reviews/search.html', context)
 
 from django.contrib.auth.decorators import login_required
@@ -21,19 +37,23 @@ from reviews.forms import BookForm, ReviewForm
 from .models import Book, Review
 
 def home(request):
-    feed = request.GET.get('feed', 'following')
+    # feed can be 'following' or 'recent'; default to following for signed-in users, recent for guests
+    feed = request.GET.get('feed')
     context = {}
     if request.user.is_authenticated:
+        if feed not in ('following', 'recent'):
+            feed = 'following'
         following_users = request.user.following.all()
         following_reviews = Review.objects.filter(Q(user__in=following_users)).order_by('-created')
-        trending_reviews = Review.objects.order_by('-rating', '-created')[:10]
+        recent_reviews = Review.objects.order_by('-created')[:10]
         context['feed'] = feed
         context['following_reviews'] = following_reviews
-        context['trending_reviews'] = trending_reviews
+        context['recent_reviews'] = recent_reviews
     else:
-        trending_reviews = Review.objects.order_by('-rating', '-created')[:10]
-        context['feed'] = 'trending'
-        context['trending_reviews'] = trending_reviews
+        # guests always see recent reviews
+        recent_reviews = Review.objects.order_by('-created')[:10]
+        context['feed'] = 'recent'
+        context['recent_reviews'] = recent_reviews
     return render(request, "reviews/home.html", context)
 
 @login_required
@@ -72,3 +92,27 @@ def review_create(request, book_id):
     else:
         form = ReviewForm()
     return render(request, "reviews/review_create.html", {"form": form, "book": book})
+
+@login_required
+def review_edit(request, book_id, review_id):
+    book = get_object_or_404(Book, id=book_id)
+    review = get_object_or_404(Review, id=review_id, user=request.user, book=book)
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect("book_detail", book_id=book.id)
+    else:
+        form = ReviewForm(instance=review)
+    return render(request, "reviews/review_edit.html", {"form": form, "book": book})
+
+@login_required
+def review_delete(request, book_id, review_id):
+    book = get_object_or_404(Book, id=book_id)
+    review = get_object_or_404(Review, id=review_id, user=request.user, book=book)
+    if request.method == "POST":
+        review.delete()
+        return redirect("book_detail", book_id=book.id)
+    else:
+        form = ReviewForm(instance=review)
+        return render(request, "reviews/review_delete.html", {"form": form, "book": book})

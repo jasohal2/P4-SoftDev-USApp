@@ -1,18 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="page-wrapper">
 {% if user.is_authenticated %}
-	<div style="margin: 1em 0;">
-		<a href="?feed=following">Following</a>
-		<a href="?feed=trending">Trending</a>
-	</div>
 	{% if feed == 'following' %}
 		{% include "reviews/partials/following_feed.html" with reviews=following_reviews %}
-	{% elif feed == 'trending' %}
-		{% include "reviews/partials/trending_feed.html" with reviews=trending_reviews %}
+		<a href="?feed=recent" class="feed-switch-link">See all recent reviews</a>
+	{% elif feed == 'recent' %}
+		{% include "reviews/partials/recent_feed.html" with reviews=recent_reviews %}
+		<a href="?feed=following" class="feed-switch-link">See reviews by users you follow</a>
 	{% endif %}
 {% else %}
-	<h2>Trending Reviews</h2>
-	{% include "reviews/partials/trending_feed.html" with reviews=trending_reviews %}
+	{% include "reviews/partials/recent_feed.html" with reviews=recent_reviews %}
 {% endif %}
+</div>
 {% endblock content %}

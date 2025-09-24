@@ -41,5 +41,20 @@
       </div>
     </nav>
     {% block content %} {% endblock content %}
+    <script>
+    // Generic deletion confirm (progressive enhancement)
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-confirm-delete]');
+      if(!btn) return;
+      const form = btn.closest('form');
+      if(!form) return;
+      const label = btn.getAttribute('data-item-label') || 'this item';
+      const msg = `Are you sure you want to delete ${label}? This cannot be undone.`;
+      if(!window.confirm(msg)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+    </script>
   </body>
 </html>

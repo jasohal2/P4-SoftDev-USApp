@@ -1,15 +1,51 @@
-{% load review_extras %}
-{% if reviews %}
-    <ul>
-    {% for review in reviews %}
-        <li>
-            <strong><a href="{% url 'book_detail' review.book.id %}#review-{{ review.id }}">{{ review.headline }}</a></strong> by <a href="{% url 'user_profile' review.user.username %}">{{ review.user.full_name }}</a><br>
-            Book: {{ review.book.title }}<br>
-            Rating: {{ review.rating }}<br>
-            {{ review.body|linebreaksbr }}
-        </li>
-    {% endfor %}
-    </ul>
+{% load review_extras %} {% if reviews %}
+<h1>Reviews by users you follow</h1>
+<ul class="home-review-list">
+  {% for review in reviews %}
+  <li class="home-review-item">
+      <img
+        src="{{ review.book.image.url }}"
+        class="home-review-item_img"
+        alt="{{ review.book.title }} cover"
+      />
+    <div class="home-review-item_description">
+        <a 
+          href="{% url 'book_detail' review.book.id %}"
+          class="home-review-item_book-link"
+            >{{ review.book.title }}</a
+          >
+          <h3 class="home-review-item_headline">
+            <span class="home-review-item_headline-text"
+              >{{ review.headline }}</span
+            >
+            <span
+              class="book-rating"
+              aria-label="Rating: {{ review.rating }} out of 5"
+            >
+              {% render_stars review.rating %}
+            </span>
+          </h3>
+          <p class="home-review-item_body" id="review-body-{{ review.id }}">
+            {{ review.body }}
+          </p>
+          <div class="home-review-item_links">
+            <a
+              class="home-review-item_link-direct"
+              href="{% url 'book_detail' review.book.id %}#review-{{ review.id }}"
+              >Read full review →</a
+            >
+          </div>
+          <p class="home-review-item_info">
+            New review by
+            <a href="{% url 'user_profile' review.user.username %}"
+              >{{ review.user.username }}</a
+            >
+            on {{ review.created|date:"M j, Y \\a\\t g:i A" }}
+          </p>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
 {% else %}
-    <p>No reviews from users you follow yet.</p>
+<p>No reviews from users you follow yet.</p>
 {% endif %}
