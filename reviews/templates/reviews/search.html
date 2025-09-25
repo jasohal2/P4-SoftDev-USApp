@@ -69,6 +69,8 @@
   <p>No results yet. Try refining your search.</p>
   {% endif %} {% if user.is_authenticated %}
   <a href="{% url 'book_create' %}" class="btn">Create a new book</a>
+  {% else %}
+  <p class="cta"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'signup' %}">Sign up</a> to create a new book.</p>
   {% endif %}
   <br />
   <br />

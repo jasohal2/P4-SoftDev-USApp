@@ -11,9 +11,13 @@
     {% endif %}
     <div class="book_description-text"><p>{{ book.description }}</p></div>
   </div>
+  {% if user.is_authenticated %}
   <a href="{% url 'review_create' book.id %}" class="btn"
     >Post a review for this book</a
   >
+  {% else %}
+    <p class="cta"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'signup' %}">Sign up</a> to post a review for this book.</p>
+  {% endif %}
   <ul class="reviews-list">
     {% for review in reviews %}
     <li class="review-item" id="review-{{ review.id }}">

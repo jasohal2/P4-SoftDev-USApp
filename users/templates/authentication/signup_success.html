@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="signup-success">
+    <div class="icon-success" aria-hidden="true">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" opacity="0.35" />
+        <path d="M16.5 9l-5.2 5.2L7.5 10.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <h2>Account created</h2>
+    <p>Thanks, {{ username }}! Your account has been created successfully.</p>
+    <p>
+      You can now <a href="{% url 'login' %}">log in</a> with your credentials.
+    </p>
+  </div>
+</div>
+{% endblock %}

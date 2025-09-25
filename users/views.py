@@ -3,25 +3,49 @@
 Includes lightweight docstrings and PEP8-friendly import ordering.
 """
 
-from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from reviews.models import Review
 from users.models import User
 
 from . import forms
 
+class ProfileRedirectLoginView(LoginView):
+    """Login view that redirects authenticated users to their profile.
+
+    Uses the existing login template and avoids showing login to already
+    authenticated users by redirecting to /users/<username>/.
+    """
+    template_name = "authentication/login.html"
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        # After a successful login, go to the user's profile page
+        return reverse('user_profile', kwargs={'username': self.request.user.username})
+
 def signup_page(request):
-    """Render and process the signup form; log in the new user on success."""
+    """Render and process the signup form and show confirmation on success.
+
+    If the user is already authenticated, redirect them to their profile
+    page instead of showing the signup form again.
+    """
+    if request.user.is_authenticated:
+        return redirect("user_profile", username=request.user.username)
     form = forms.SignUpForm()
     if request.method == "POST":
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            return redirect("home")
+            # Do not auto-login; show success page with link to login
+            return render(
+                request,
+                "authentication/signup_success.html",
+                {"username": user.username},
+            )
     return render(request, "authentication/signup.html", {"form": form})
 
 def username_available(request):
