@@ -1,14 +1,20 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from users.models import User
+"""User views: signup, profile, and small AJAX helpers.
+
+Includes lightweight docstrings and PEP8-friendly import ordering.
+"""
+
 from django.contrib.auth import login
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from reviews.models import Review
+from users.models import User
 
 from . import forms
-from reviews.models import Review
 
 def signup_page(request):
+    """Render and process the signup form; log in the new user on success."""
     form = forms.SignUpForm()
     if request.method == "POST":
         form = forms.SignUpForm(request.POST)
@@ -43,6 +49,11 @@ def email_available(request):
 
 @login_required
 def user_profile(request, username):
+    """Show a user's profile and reviews; allow follow/unfollow actions.
+
+    When viewing your own profile, supports searching for other users by
+    username or name parts and following/unfollowing them.
+    """
     profile_user = get_object_or_404(User, username=username)
     is_following = request.user.following.filter(pk=profile_user.pk).exists()
     user_search_results = []
@@ -83,4 +94,15 @@ def user_profile(request, username):
             return redirect('user_profile', username=profile_user.username)
     reviews = Review.objects.filter(user=profile_user).select_related('book').order_by('-created')
     following_ids = set(request.user.following.values_list('id', flat=True)) if request.user.is_authenticated else set()
-    return render(request, "users/profile.html", {"profile_user": profile_user, "is_following": is_following, "reviews": reviews, "following_ids": following_ids, "user_search_results": user_search_results, "user_search_query": search_query})
+    return render(
+        request,
+        "users/profile.html",
+        {
+            "profile_user": profile_user,
+            "is_following": is_following,
+            "reviews": reviews,
+            "following_ids": following_ids,
+            "user_search_results": user_search_results,
+            "user_search_query": search_query,
+        },
+    )

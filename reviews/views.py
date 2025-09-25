@@ -1,7 +1,21 @@
+"""Views for search, home feeds, and CRUD in the reviews app.
+"""
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+
 from users.models import User
-from django.db.models import Q, Count, Avg
+from reviews.forms import BookForm, ReviewForm
+from .models import Book, Review
 
 def search(request):
+    """Search users and books by query string.
+
+    - Users: excludes current user when authenticated, annotated with
+      review/follow counts.
+    - Books: annotated with average rating and review count.
+    """
     query = request.GET.get('q', '').strip()
     users = books = None
     if query:
@@ -31,44 +45,51 @@ def search(request):
     context = {'users': users, 'books': books, 'query': query}
     return render(request, 'reviews/search.html', context)
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from reviews.forms import BookForm, ReviewForm
-from .models import Book, Review
-
 def home(request):
-    # feed can be 'following' or 'recent'; default to following for signed-in users, recent for guests
+    """Render the home feed.
+
+    feed can be 'following' or 'recent'; default to following for
+    signed-in users, recent for guests.
+    """
     feed = request.GET.get('feed')
     context = {}
     if request.user.is_authenticated:
         if feed not in ('following', 'recent'):
             feed = 'following'
         following_users = request.user.following.all()
-        following_reviews = Review.objects.filter(Q(user__in=following_users)).order_by('-created')
-        recent_reviews = Review.objects.order_by('-created')[:10]
+        following_reviews = (
+            Review.objects.filter(Q(user__in=following_users))
+            .select_related('book', 'user')
+            .order_by('-created')
+        )
+        recent_reviews = (
+            Review.objects.select_related('book', 'user').order_by('-created')[:10]
+        )
         context['feed'] = feed
         context['following_reviews'] = following_reviews
         context['recent_reviews'] = recent_reviews
     else:
         # guests always see recent reviews
-        recent_reviews = Review.objects.order_by('-created')[:10]
+        recent_reviews = Review.objects.select_related('book', 'user').order_by('-created')[:10]
         context['feed'] = 'recent'
         context['recent_reviews'] = recent_reviews
     return render(request, "reviews/home.html", context)
 
 @login_required
 def recent_reviews(request):
-    # Show top-rated reviews for logged-in users
-    reviews = Review.objects.order_by('-rating', '-created')[:10]
+    """Show top-rated reviews for logged-in users (legacy page)."""
+    reviews = Review.objects.select_related('book', 'user').order_by('-rating', '-created')[:10]
     return render(request, "reviews/recent_reviews.html", {"reviews": reviews})
 
 def book_detail(request, book_id):
+    """Display book detail and its reviews."""
     book = get_object_or_404(Book, id=book_id)
-    reviews = book.review_set.all()
-    return render(request, "reviews/book.html", context = {"book": book, "reviews": reviews})
+    reviews = book.review_set.select_related('user').all()
+    return render(request, "reviews/book.html", context={"book": book, "reviews": reviews})
 
 @login_required
 def book_create(request):
+    """Create a new book (title, cover, description)."""
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
@@ -80,6 +101,7 @@ def book_create(request):
 
 @login_required
 def review_create(request, book_id):
+    """Create a review for a given book."""
     book = get_object_or_404(Book, id=book_id)
     if request.method == "POST":
         form = ReviewForm(request.POST)
@@ -95,6 +117,7 @@ def review_create(request, book_id):
 
 @login_required
 def review_edit(request, book_id, review_id):
+    """Edit an existing review owned by the user."""
     book = get_object_or_404(Book, id=book_id)
     review = get_object_or_404(Review, id=review_id, user=request.user, book=book)
     if request.method == "POST":
@@ -108,6 +131,10 @@ def review_edit(request, book_id, review_id):
 
 @login_required
 def review_delete(request, book_id, review_id):
+    """Delete a review (POST only), scoped to the owner and book.
+
+    GET returns a fallback confirmation template.
+    """
     book = get_object_or_404(Book, id=book_id)
     review = get_object_or_404(Review, id=review_id, user=request.user, book=book)
     if request.method == "POST":

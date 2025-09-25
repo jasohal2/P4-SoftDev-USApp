@@ -1,19 +1,85 @@
 # LITREVIEW
 
-This repository contains basic code to get you started on the LIT Review platform.
+Minimal Goodreads-style app to review books and follow other users.
 
-## Structure
+## Project structure
 
-The project has two Django applications:
-* `reviews`: contains the models for the `Book` and `Review` entities
-* `users`: contains the model for the custom user model (see `AUTH_USER_MODEL` in [`settings.py`](litreview/settings.py))
+Apps:
+- `reviews`: Book and Review models, views, and templates
+- `users`: Custom User model, authentication, profile, and follow system
 
-## Setup
+Key pages:
+- Home feed (recent/following)
+- Search (users and books)
+- Book detail and review CRUD
+- User profiles with follow/unfollow and reviews list
 
-Install the dependencies (make sure you are using a virtual environment): `pip install -r requirements.txt`
+## Quickstart (macOS, zsh)
 
-Make sure the database migrations are applied: `python manage.py migrate`.
+1) Create and activate a virtualenv
+- python3 -m venv .venv
+- source .venv/bin/activate
 
-You can then run the server with `python manage.py runserver`.
+2) Install dependencies
+- pip install -r requirements.txt
 
-Refer to [Django documentation](https://docs.djangoproject.com/en/) for more information.
+3) Configure environment (optional)
+- Copy .env.example to .env and adjust if present; by default SQLite is used.
+
+4) Initialize database
+- python manage.py migrate
+- python manage.py createsuperuser  # follow prompts
+
+5) Run the server
+- python manage.py runserver
+
+6) Open the app
+- http://127.0.0.1:8000/
+
+## Using the app
+
+- Sign up or log in with your superuser.
+- Use the search bar to find users or books by title.
+- Create a book if it does not exist, then write a review (rating + text).
+- Follow users to see their reviews in your Following feed.
+
+## Media and static files
+
+- Book covers are uploaded to the local filesystem during development.
+- The code guards against missing images and shows placeholders.
+- Do not commit media files to Git. The `.gitignore` excludes images and SQLite DB by default.
+
+## Development notes
+
+- Code style: PEP8; views have lightweight docstrings. Run tools like flake8/black if you prefer.
+- Query performance: feeds and detail pages use select_related to avoid N+1 queries.
+- Deletion UX: review deletions use a confirm() dialog with POST; a server-side fallback page exists for noscript.
+- SVG icons are inline for search/home/back; no FontAwesome dependency for icons.
+
+## Common tasks
+
+- Load initial data (optional): python manage.py loaddata database.json
+- Create a test user quickly:
+	- python manage.py shell
+	- from users.models import User; User.objects.create_user('demo', password='demo')
+
+## Cleaning up tracked artifacts
+
+If `db.sqlite3` or image files were committed before `.gitignore` rules were added, untrack them without deleting local copies:
+- git rm -r --cached db.sqlite3 media/ *.jpg *.jpeg
+- git commit -m "chore: stop tracking sqlite and media files"
+
+## Requirements
+
+See `requirements.txt`. Tested with:
+- Django 4.0.x
+- Pillow 9.x
+
+## Troubleshooting
+
+- If you see template errors about image `.url`, ensure you pulled latest templates with image guards.
+- If styles look off, clear your browser cache or check for stray CSS braces.
+
+## License
+
+For educational use as part of OpenClassrooms project work.

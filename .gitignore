@@ -131,3 +131,10 @@ dmypy.json
 # .jpg files
 *.jpg
 *.jpeg
+
+# macOS
+.DS_Store
+
+# Local media/static (dev)
+media/
+staticfiles/
