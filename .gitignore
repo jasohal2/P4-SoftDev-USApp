@@ -138,3 +138,7 @@ dmypy.json
 # Local media/static (dev)
 media/
 staticfiles/
+
+# OpenClassroom files
+Project_4_Django_Hall_Jason.zip
+Hall_Jason_1_repo_09012025.txt

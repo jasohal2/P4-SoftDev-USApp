@@ -58,10 +58,12 @@ Key pages:
 
 ## Common tasks
 
-- Load initial data (optional): python manage.py loaddata database.json
+- Load example data (optional): python manage.py loaddata database.json
 - Create a test user quickly:
 	- python manage.py shell
 	- from users.models import User; User.objects.create_user('demo', password='demo')
+
+Note: The provided `database.json` fixture is sanitized to include ONLY users, books, and reviews (no admin logs, permissions, sessions, or media filenames). Fixture user passwords are placeholder values and not valid for login. After loading, set a password via the admin or shell, e.g. (Django shell): `u = User.objects.get(username='jasohal2'); u.set_password('demo'); u.save()`.
 
 ## Cleaning up tracked artifacts
 
